@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngoga Alexis - Data Scientist & Software Engineer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 100px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.6s forwards;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .social-links {
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.9s forwards;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Main Content */
+        main {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            margin-top: -20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #2d3748;
+            position: relative;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        /* Education Section */
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .education-card {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .education-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .education-card h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .education-card .university {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .education-card .year {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .coursework {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Experience Section */
+        .experience-timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .experience-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: #e2e8f0;
+        }
+
+        .experience-item {
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .experience-item:nth-child(odd) .experience-card {
+            margin-right: 60%;
+        }
+
+        .experience-item:nth-child(even) .experience-card {
+            margin-left: 60%;
+        }
+
+        .experience-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .experience-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .experience-card h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .experience-card .company {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .experience-card .duration {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .experience-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .experience-card li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .experience-card li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .project-header h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .project-body {
+            padding: 1.5rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tech-tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Certifications Section */
+        .certifications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .certification-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .certification-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .certification-card.featured {
+            border: 2px solid #667eea;
+            background: linear-gradient(135deg, #667eea08, #764ba208);
+        }
+
+        .cert-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+            overflow: hidden;
+            position: relative;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .cert-icon img {
+            width: 100%;
+            height: 100%;
+            max-width: 44px;
+            max-height: 44px;
+            object-fit: contain;
+            object-position: center;
+            border-radius: 50%;
+            background: white;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+
+        .cert-icon i {
+            font-size: 1.5rem;
+            max-width: 44px;
+            max-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cert-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .cert-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+
+        .cert-link i {
+            font-size: 0.8rem;
+        }
+
+        .certification-card h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .cert-subtitle {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .certification-card p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .cert-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+        }
+
+        .skill-tag {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.2rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+        }
+
+        .certification-card.featured .skill-tag {
+            background: #667eea15;
+            color: #667eea;
+            border-color: #667eea30;
+        }
+
+        /* Publications Section */
+        .publications-note {
+            text-align: center;
+            font-style: italic;
+            color: #718096;
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: #f7fafc;
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-info {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .contact-info p {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        /* Footer */
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .experience-item:nth-child(odd) .experience-card,
+            .experience-item:nth-child(even) .experience-card {
+                margin: 0;
+            }
+            
+            .experience-timeline::before {
+                left: 20px;
+            }
+            
+            .education-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">Ngoga Alexis</div>
+            <ul class="nav-links">
+                <li><a href="#education">Education</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#certifications">Certifications</a></li>
+                <li><a href="#publications">Publications</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Ngoga Alexis</h1>
+            <p>Data Scientist & Software Engineer</p>
+            <p>Leveraging AI and Machine Learning to enhance operational efficiency and drive business growth</p>
+            
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary" id="resume-download">
+                    <i class="fas fa-download"></i>
+                    Download Resume
+                </a>
+                <a href="#contact" class="btn btn-outline">
+                    <i class="fas fa-envelope"></i>
+                    Get In Touch
+                </a>
+            </div>
+            
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/alexis-ngoga-24460022b/" target="_blank" title="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://github.com/Ngoga-Musagi" target="_blank" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="mailto:r.alexisngoga20@gmail.com" title="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <!-- Education Section -->
+        <section id="education" class="section">
+            <div class="container">
+                <h2>Education</h2>
+                <div class="education-grid">
+                    <div class="education-card">
+                        <h3>Master of Science in Engineering Artificial Intelligence</h3>
+                        <div class="university">Carnegie Mellon University</div>
+                        <div class="year">May 2025</div>
+                        <div class="coursework">
+                            <strong>Relevant Coursework:</strong> Data Inference and Applied Machine Learning, Introduction to Deep Learning, Humanoid Robotics and Cognition, Applied Computer Vision, Artificial Intelligence System Design, AIOPS, DevOps, Cloud Computing.
+                        </div>
+                    </div>
+                    
+                    <div class="education-card">
+                        <h3>Bachelor of Science in Information Technology</h3>
+                        <div class="university">Adventist University of Central Africa</div>
+                        <div class="year">2019 - 2023</div>
+                        <div class="coursework">
+                            <strong>Relevant Coursework:</strong> Software Engineering, Object-Oriented Programming, Java Programming, Web Technologies, Software Modeling and Design, Software Quality Assurance.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="section">
+            <div class="container">
+                <h2>Experience</h2>
+                <div class="experience-timeline">
+                    <div class="experience-item">
+                        <div class="experience-card">
+                            <h3>Graduate Research Assistant</h3>
+                            <div class="company">CMU-Africa, Kigali, Rwanda</div>
+                            <div class="duration">June 2024 - May 2025</div>
+                            <ul>
+                                <li>Working on machine learning projects involving data fusion from satellite and drone images to enhance crop mapping in smallholder farming</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="experience-item">
+                        <div class="experience-card">
+                            <h3>Data Science Fellowship Program</h3>
+                            <div class="company">Analytics For Better World, Remote, Netherlands</div>
+                            <div class="duration">September 2024 - November 2024</div>
+                            <ul>
+                                <li>Successfully applied machine learning and geospatial data analysis to assess urban heat patterns for sustainable urban development</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="experience-item">
+                        <div class="experience-card">
+                            <h3>Data Analyst</h3>
+                            <div class="company">MJS Partners Ltd, Kigali, Rwanda</div>
+                            <div class="duration">March 2022 - September 2023</div>
+                            <ul>
+                                <li>Developed backend applications using Spring Boot and Hibernate for financial management systems</li>
+                                <li>Analyzed software-generated data to identify patterns and trends, facilitating data-driven decision-making</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+            <div class="container">
+                <h2>Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-header">
+                            <h3>LLM-Powered Cloud Resource Management</h3>
+                        </div>
+                        <div class="project-body">
+                            <p>Developed a comprehensive system to manage AWS cloud resources, focusing on automating resource allocation, optimizing costs, and providing real-time architecture recommendations using Large Language Models.</p>
+                            <div class="tech-stack">
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">AWS</span>
+                                <span class="tech-tag">LLM</span>
+                                <span class="tech-tag">Cloud Computing</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-header">
+                            <h3>Anomaly Detection in GKE</h3>
+                        </div>
+                        <div class="project-body">
+                            <p>Implemented an advanced anomaly detection system for Google Kubernetes Engine (GKE) using Prophet for time series forecasting and Istio for real-time monitoring and service mesh management.</p>
+                            <div class="tech-stack">
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">GKE</span>
+                                <span class="tech-tag">Prophet</span>
+                                <span class="tech-tag">Istio</span>
+                                <span class="tech-tag">Kubernetes</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-card">
+                        <div class="project-header">
+                            <h3>Crop Mapping with ML & Remote Sensing</h3>
+                        </div>
+                        <div class="project-body">
+                            <p>Research project involving data fusion from satellite and drone imagery to enhance crop mapping accuracy in smallholder farming systems using advanced machine learning techniques.</p>
+                            <div class="tech-stack">
+                                <span class="tech-tag">Machine Learning</span>
+                                <span class="tech-tag">Computer Vision</span>
+                                <span class="tech-tag">Remote Sensing</span>
+                                <span class="tech-tag">Geospatial Analysis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certifications Section -->
+        <section id="certifications" class="section">
+            <div class="container">
+                <h2>Certifications</h2>
+                <div class="certifications-grid">
+                    <div class="certification-card featured">
+                        <div class="cert-icon">
+                            <img src="./icons/neo4j-icon.png" alt="Neo4j" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-database" style="display: none;"></i>
+                        </div>
+                        <h3>Neo4j Certified Professional</h3>
+                        <p>Advanced graph database management and query optimization using Cypher. Expertise in designing and implementing graph-based solutions.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">Graph Databases</span>
+                            <span class="skill-tag">Cypher</span>
+                            <span class="skill-tag">Neo4j</span>
+                        </div>
+                        <a href="https://graphacademy.neo4j.com/c/0fd4f3ab-adf3-47f5-bf47-067054b90b79/" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card featured">
+                        <div class="cert-icon">
+                            <img src="./icons/qiskit-icon.png" alt="Qiskit" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-atom" style="display: none;"></i>
+                        </div>
+                        <h3>Qiskit Global Summer School 2024</h3>
+                        <p class="cert-subtitle">Quantum Excellence</p>
+                        <p>Hands-on experience in quantum computation, quantum algorithms, and quantum machine learning using IBM's Qiskit framework.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">Quantum Computing</span>
+                            <span class="skill-tag">Qiskit</span>
+                            <span class="skill-tag">Quantum ML</span>
+                        </div>
+                        <a href="https://www.credly.com/badges/99b7425e-17a8-4a9c-b6ac-8165590c31a4" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/bioscience-icon.png" alt="Bio Science" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-microscope" style="display: none;"></i>
+                        </div>
+                        <h3>Data Science and Machine Learning for Bio Science</h3>
+                        <p>Application of machine learning techniques to biological data analysis, genomics, and bioinformatics workflows.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">Bioinformatics</span>
+                            <span class="skill-tag">ML</span>
+                            <span class="skill-tag">Genomics</span>
+                        </div>
+                        <a href="https://www.linkedin.com/in/alexis-ngoga-24460022b/details/certifications/1710283975491/single-media-viewer/?profileId=ACoAADmTeVQB-Sz8MvIMwV28VAG1SJ1eXieWllQ" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/climate-icon.png" alt="Climate Training" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-leaf" style="display: none;"></i>
+                        </div>
+                        <h3>Youth Climate Training</h3>
+                        <p>Climate change awareness, environmental data analysis, and sustainable technology solutions for climate action.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">Climate Data</span>
+                            <span class="skill-tag">Sustainability</span>
+                            <span class="skill-tag">Environmental Science</span>
+                        </div>
+                        <a href="https://credsverse.com/credentials/a291ad36-f94e-436b-a42a-b3659f261cda" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/data-science-icon.png" alt="Applied Data Science" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-chart-line" style="display: none;"></i>
+                        </div>
+                        <h3>Applied Data Science Lab</h3>
+                        <p>Comprehensive data science skills including ETL pipelines, machine learning, and data architecture design.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">SQL</span>
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">Data Architecture</span>
+                            <span class="skill-tag">Databases</span>
+                        </div>
+                        <a href="https://www.credly.com/badges/ccf54e84-9a5e-451e-be38-bf01a898dc9a/linked_in_profile" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/scalable-systems-icon.png" alt="Scalable Systems" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-server" style="display: none;"></i>
+                        </div>
+                        <h3>Building Scalable Systems</h3>
+                        <p>System design principles, microservices architecture, and scalability patterns for high-performance applications.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">System Design</span>
+                            <span class="skill-tag">Scalability</span>
+                            <span class="skill-tag">Architecture</span>
+                        </div>
+                        <a href="https://www.credly.com/earner/earned/badge/51020aaf-2cb9-4350-b00b-699fb480b847" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/python-icon.png" alt="Python" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fab fa-python" style="display: none;"></i>
+                        </div>
+                        <h3>Python 101 for Data Science</h3>
+                        <p>Foundation in Python programming specifically tailored for data science applications and analytics workflows.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">Data Science</span>
+                            <span class="skill-tag">Analytics</span>
+                        </div>
+                        <a href="https://courses.cognitiveclass.ai/certificates/8347137168674c6da2298d9854e5faad" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/microservices-icon.png" alt="Microservices" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-cogs" style="display: none;"></i>
+                        </div>
+                        <h3>Reactive Microservices</h3>
+                        <p>Building responsive, resilient, and elastic microservices using reactive programming patterns and architectures.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">Microservices</span>
+                            <span class="skill-tag">Reactive Programming</span>
+                            <span class="skill-tag">Distributed Systems</span>
+                        </div>
+                        <a href="https://courses.cognitiveclass.ai/certificates/5fb459ea13424c71b5b33f81ec31545a" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/ddd-icon.png" alt="Domain Driven Design" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-sitemap" style="display: none;"></i>
+                        </div>
+                        <h3>Reactive Architecture: Domain Driven Design</h3>
+                        <p>Advanced software architecture patterns using Domain Driven Design principles in reactive systems.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">DDD</span>
+                            <span class="skill-tag">Architecture</span>
+                            <span class="skill-tag">Design Patterns</span>
+                        </div>
+                        <a href="https://courses.cognitiveclass.ai/certificates/c88ae86a06b24ea3a51905e739ad834c" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                    
+                    <div class="certification-card">
+                        <div class="cert-icon">
+                            <img src="./icons/ai-community-icon.png" alt="AI for Communities" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <i class="fas fa-users" style="display: none;"></i>
+                        </div>
+                        <h3>AI Empowerment for Communities</h3>
+                        <p>Applying artificial intelligence solutions for social good and community development initiatives.</p>
+                        <div class="cert-skills">
+                            <span class="skill-tag">AI for Good</span>
+                            <span class="skill-tag">Community Impact</span>
+                            <span class="skill-tag">Social Innovation</span>
+                        </div>
+                        <a href="https://www.linkedin.com/in/alexis-ngoga-24460022b/details/certifications/1716963241068/single-media-viewer/?profileId=ACoAADmTeVQB-Sz8MvIMwV28VAG1SJ1eXieWllQ" target="_blank" class="cert-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            View Certificate
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Publications Section -->
+        <section id="publications" class="section">
+            <div class="container">
+                <h2>Publications</h2>
+                <div class="publications-note">
+                    <p>Research publications and academic papers will be added here as they become available. Currently working on several research projects in machine learning, computer vision, and geospatial data analysis that will result in publications.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section contact-section">
+            <div class="container">
+                <h2>Get In Touch</h2>
+                <form class="contact-form" id="contact-form">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Message
+                    </button>
+                </form>
+                
+                <div class="contact-info">
+                    <p><i class="fas fa-phone"></i> +250784720789</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Kigali, Rwanda</p>
+                    <p><i class="fas fa-envelope"></i> r.alexisngoga20@gmail.com</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Ngoga Alexis. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Contact form handling
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const subject = formData.get('subject');
+            const message = formData.get('message');
+            
+            // Simple validation
+            if (!name || !email || !subject || !message) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+            
+            // Create comprehensive mailto link
+            const emailBody = `Hello Alexis,
+
+My name is ${name} and I'm reaching out regarding: ${subject}
+
+${message}
+
+Best regards,
+${name}
+Email: ${email}`;
+            
+            const mailtoLink = `mailto:r.alexisngoga20@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
+            
+            // Reset form after a delay
+            setTimeout(() => {
+                this.reset();
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10b981;
+                    color: white;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease;
+                `;
+                successMsg.innerHTML = '<i class="fas fa-check-circle"></i> Email client opened! Please send your message.';
+                document.body.appendChild(successMsg);
+                
+                // Remove success message after 5 seconds
+                setTimeout(() => {
+                    successMsg.remove();
+                }, 5000);
+            }, 1000);
+        });
+
+        // Resume download handling
+        document.getElementById('resume-download').addEventListener('click', function(e) {
+            e.preventDefault();
+            const link = document.createElement('a');
+            link.href = './Alexis_Ngoga_resume.pdf';
+            link.download = 'Alexis_Ngoga_Resume.pdf';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections for scroll animations
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

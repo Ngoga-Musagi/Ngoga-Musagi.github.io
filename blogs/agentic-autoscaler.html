@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From Reactive to Reasoning: An Agentic Autoscaler for Kubernetes</title>
+<meta name="description" content="Building a Kubernetes operator that fuses Prometheus metrics with log streams and AI reasoning to make proactive, explainable scaling decisions — and refuses bad ones." />
+<style>
+  :root {
+    --fg: #1a1a1a;
+    --fg-soft: #4a4a4a;
+    --muted: #6e6e6e;
+    --accent: #0b5fff;
+    --accent-soft: #e8efff;
+    --rule: #e6e6e6;
+    --code-bg: #f6f6f7;
+    --code-fg: #1a1a1a;
+    --callout-bg: #fff8e1;
+    --callout-border: #f0c000;
+    --note-bg: #e8f7ee;
+    --note-border: #2aa05a;
+    --max: 760px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--fg);
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 56px 24px 96px; }
+  header.hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  .kicker {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 38px;
+    line-height: 1.15;
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+  }
+  .lede {
+    font-size: 19px;
+    color: var(--fg-soft);
+    margin: 0;
+  }
+  .byline {
+    margin-top: 28px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .byline strong { color: var(--fg); font-weight: 600; }
+  nav.toc {
+    background: var(--code-bg);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 32px 0 40px;
+    font-size: 14.5px;
+  }
+  nav.toc strong {
+    display: block;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  nav.toc ol { margin: 0; padding-left: 22px; }
+  nav.toc li { padding: 2px 0; }
+  nav.toc a { color: var(--fg); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+  h2 {
+    font-size: 26px;
+    line-height: 1.25;
+    margin: 56px 0 14px;
+    letter-spacing: -0.005em;
+    padding-top: 8px;
+  }
+  h3 {
+    font-size: 19px;
+    margin: 32px 0 10px;
+  }
+  p { margin: 0 0 18px; }
+  ul, ol { margin: 0 0 18px; padding-left: 22px; }
+  li { margin: 4px 0; }
+  a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.92em;
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0 0 20px;
+    border: 1px solid var(--rule);
+  }
+  pre code { background: transparent; padding: 0; font-size: inherit; }
+  .callout {
+    background: var(--callout-bg);
+    border-left: 4px solid var(--callout-border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 24px 0;
+    font-size: 15.5px;
+  }
+  .note {
+    background: var(--note-bg);
+    border-left: 4px solid var(--note-border);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 24px 0;
+    font-size: 15.5px;
+  }
+  .callout p:last-child, .note p:last-child { margin-bottom: 0; }
+  blockquote {
+    margin: 24px 0;
+    padding: 6px 22px;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    font-style: italic;
+    color: var(--fg-soft);
+  }
+  blockquote p:last-child { margin-bottom: 0; }
+  .arch {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin: 24px 0 28px;
+    font-size: 13px;
+  }
+  .arch .box {
+    border: 1px solid var(--rule);
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .arch .box .num {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .arch .box .name { display: block; font-weight: 600; }
+  .arch .box .path { display: block; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .flow-arrow { text-align: center; color: var(--muted); margin: -8px 0 16px; font-size: 18px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0 24px;
+    font-size: 14.5px;
+  }
+  th, td {
+    border-bottom: 1px solid var(--rule);
+    padding: 9px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { font-weight: 600; color: var(--fg-soft); border-bottom-width: 2px; }
+  tr:hover td { background: #fafbff; }
+  footer {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  footer a { color: var(--accent); }
+  @media (max-width: 640px) {
+    .wrap { padding: 32px 18px 64px; }
+    h1 { font-size: 30px; }
+    h2 { font-size: 22px; }
+    .arch { grid-template-columns: repeat(2, 1fr); }
+    body { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <span class="kicker">Kubernetes · AI · Platform Engineering</span>
+  <h1>From Reactive to Reasoning: An Agentic Autoscaler for Kubernetes</h1>
+  <p class="lede">Production incidents start in logs — timeout storms, connection-pool exhaustion, retry cascades — minutes before CPU or memory move. So why are we still scaling on metrics alone?</p>
+  <p class="byline">By <strong>Alexis Ngoga</strong> · AI Engineer &amp; Solutions Architect · 2026</p>
+</header>
+
+<nav class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#gap">The four-minute gap</a></li>
+    <li><a href="#agentic">What &ldquo;agentic&rdquo; means in a control loop</a></li>
+    <li><a href="#architecture">Architecture: six stages, one CRD</a></li>
+    <li><a href="#signals">Signals: typed snapshots from Prometheus and logs</a></li>
+    <li><a href="#fusion">Fusion: turning log lines into patterns</a></li>
+    <li><a href="#reasoning">Reasoning: rules first, AI second</a></li>
+    <li><a href="#refusal">Why the AI refuses bad scaling decisions</a></li>
+    <li><a href="#policy">Policy: nesting safely inside HPA</a></li>
+    <li><a href="#explain">Explainability: every decision has a sentence</a></li>
+    <li><a href="#case">The case study: API gateway timeout storm</a></li>
+    <li><a href="#bugs">Three bugs you only find under load</a></li>
+    <li><a href="#try">Try it yourself</a></li>
+    <li><a href="#next">What&rsquo;s next</a></li>
+  </ol>
+</nav>
+
+<h2 id="gap">1. The four-minute gap</h2>
+
+<p>The Kubernetes Horizontal Pod Autoscaler is a triumph of simplicity. You set a CPU target, it watches the metric, it adjusts the replica count. For workloads whose failure mode is &ldquo;the box is too small,&rdquo; HPA is genuinely all you need.</p>
+
+<p>The problem is that most production incidents don&rsquo;t start that way. They start in the logs:</p>
+
+<ul>
+  <li>A downstream dependency starts taking 3&nbsp;seconds to answer. Your service&rsquo;s connection pool fills up. Logs start emitting <code>pool exhausted, waiting</code>.</li>
+  <li>An upstream retries aggressively. Your error counter ticks. Logs emit <code>upstream timeout: deadline exceeded</code>, then <code>circuit breaker open</code>.</li>
+  <li>A bad config lands. A pod OOM-kills, restarts, OOM-kills again. <code>OOMKilled</code> appears in events.</li>
+</ul>
+
+<p>None of these move CPU or memory in a useful way for several minutes. By the time the metric crosses a threshold, the incident is already underway, the on-call has been paged, and HPA arrives late.</p>
+
+<p>The agentic autoscaler is a small, opinionated answer to that gap: <strong>let an operator read the same logs your humans read, correlate them with the metrics, and make a proactive, explainable scaling decision.</strong> Not a chatbot, not a sidecar &mdash; a real Kubernetes operator running a reconcile loop.</p>
+
+<h2 id="agentic">2. What &ldquo;agentic&rdquo; means in a control loop</h2>
+
+<p>The word <em>agentic</em> has had a hard year. Most of the time it&rsquo;s code for &ldquo;a chat UI that calls some tools.&rdquo; That is not what this is.</p>
+
+<p>In this project, <strong>agentic</strong> means a single thing: the reasoning step in the control loop is pluggable, and at least one of the implementations uses an LLM. The interface is one line:</p>
+
+<pre><code>// pkg/reasoning/agent.go
+type Agent interface {
+    Decide(ctx context.Context, signal fusion.FusedSignal) (ScaleDecision, error)
+}</code></pre>
+
+<p>Four implementations live behind that interface:</p>
+
+<ul>
+  <li><code>RuleBasedAgent</code> &mdash; deterministic, no network calls. The default and the safety net.</li>
+  <li><code>AnthropicAgent</code> &mdash; calls the Claude API.</li>
+  <li><code>OpenAIAgent</code> &mdash; calls OpenAI.</li>
+  <li><code>OllamaAgent</code> &mdash; calls a self-hosted Ollama instance.</li>
+</ul>
+
+<p>Switching providers is an environment variable (<code>AI_PROVIDER=anthropic|openai|ollama|rules</code>). The controller never imports a vendor SDK directly. If the cloud provider is down, mis-configured, rate-limited, or returns garbage, the loop falls back to the rule-based agent without redeploying anything. <strong>Vendor neutrality isn&rsquo;t a slide here; it&rsquo;s the architecture.</strong></p>
+
+<h2 id="architecture">3. Architecture: six stages, one CRD</h2>
+
+<p>Every reconcile of an <code>AgenticAutoscaler</code> custom resource runs the same six-stage pipeline. Each stage is its own Go package, with a typed boundary in between, and not one of them has a hidden dependency on the next.</p>
+
+<div class="arch">
+  <div class="box"><span class="num">1</span><span class="name">Signals</span><span class="path">pkg/signals</span></div>
+  <div class="box"><span class="num">2</span><span class="name">Fusion</span><span class="path">pkg/fusion</span></div>
+  <div class="box"><span class="num">3</span><span class="name">Reasoning</span><span class="path">pkg/reasoning</span></div>
+  <div class="box"><span class="num">4</span><span class="name">Policy</span><span class="path">pkg/policy</span></div>
+  <div class="box"><span class="num">5</span><span class="name">Scaler</span><span class="path">pkg/scaler</span></div>
+  <div class="box"><span class="num">6</span><span class="name">Observability</span><span class="path">pkg/observability</span></div>
+</div>
+<div class="flow-arrow">↓ data flows left to right · observability records every decision regardless of outcome</div>
+
+<p>The boundaries matter because they pin down what each layer is allowed to know. <code>pkg/signals</code> doesn&rsquo;t know about Kubernetes &mdash; it&rsquo;s pure Go that talks to Prometheus and a log source. <code>pkg/fusion</code> doesn&rsquo;t know about LLMs &mdash; it just turns a snapshot into a typed structure with matched patterns and a severity score. <code>pkg/reasoning</code> doesn&rsquo;t know about replica counts &mdash; it returns a <code>ScaleDecision</code>. <code>pkg/policy</code> is the only place that knows about HPA bounds and cooldowns. <code>pkg/scaler</code> is the only place that mutates a <code>Deployment</code>.</p>
+
+<p>This is deliberate. When something goes wrong (and three things did, which we&rsquo;ll get to), you can localize the bug to one of six packages and unit-test the fix without spinning up a cluster.</p>
+
+<h2 id="signals">4. Signals: typed snapshots from Prometheus and logs</h2>
+
+<p>The first stage builds a <code>SystemSnapshot</code> from whatever sources the operator has been configured with:</p>
+
+<pre><code>// pkg/signals/snapshot.go
+type SystemSnapshot struct {
+    Timestamp time.Time
+    Metrics   MetricSnapshot
+    LogEntries []LogEntry
+}
+
+type MetricSnapshot struct {
+    LatencyP99Ms   float64
+    ErrorRatePct   float64
+    CPUUtilPct     float64
+    RequestsPerSec float64
+    CustomMetrics  map[string]float64
+}</code></pre>
+
+<p>The Prometheus collector (<code>pkg/signals/prometheus.go</code>) queries four canonical metrics by default &mdash; latency p99, error rate, CPU utilisation, and RPS &mdash; over a 2-minute window.</p>
+
+<p>And here&rsquo;s the part that turned out to matter more than I expected: <strong>every default query is overridable per-CR</strong> via a <code>$TARGET</code> token. If your service exposes its request count under a different metric name, you don&rsquo;t fork the operator; you set:</p>
+
+<pre><code>spec:
+  metrics:
+    requestsPerSecond: 'sum(rate(http_request_duration_seconds_count{service="$TARGET"}[2m]))'
+    cpuUtilization: '100 * avg(rate(container_cpu_usage_seconds_total{pod=~"$TARGET-.*"}[2m])) / avg(kube_pod_container_resource_requests{pod=~"$TARGET-.*",resource="cpu"})'</code></pre>
+
+<p>Two layers of leverage in one feature: any service can be onboarded without code changes, and you can measure CPU exactly the way HPA does (utilisation as a percentage of the CPU request) by overriding one string.</p>
+
+<p>Logs are read by <code>pkg/signals/logreader.go</code>, which has two backends: <strong>Grafana Loki</strong> (HTTP query API) and <strong>Kafka</strong> (consumer group on a topic). Both return the same <code>[]LogEntry</code> type. The choice is in the CR:</p>
+
+<pre><code>spec:
+  logSource:
+    type: loki
+    loki:
+      url: http://loki.monitoring:3100
+      query: '{namespace="production",app="payment-service"} |= ""'</code></pre>
+
+<h2 id="fusion">5. Fusion: turning log lines into patterns</h2>
+
+<p>Raw log lines aren&rsquo;t a useful input to anything. <code>pkg/fusion</code> turns them into a small set of typed patterns and a severity score that a human (and a rule) can reason about.</p>
+
+<p>The five patterns currently recognized (<code>pkg/fusion/patterns.go</code>):</p>
+
+<table>
+  <thead><tr><th>Pattern</th><th>What triggers it</th><th>Severity</th></tr></thead>
+  <tbody>
+    <tr><td><code>oom-killed</code></td><td>An OOMKilled event or restart line</td><td>critical</td></tr>
+    <tr><td><code>connection-pool-exhausted</code></td><td>&ldquo;pool exhausted,&rdquo; &ldquo;no available connections,&rdquo; similar phrasing</td><td>high</td></tr>
+    <tr><td><code>db-connection-failed</code></td><td>DB driver errors, connection refused to the database</td><td>high</td></tr>
+    <tr><td><code>circuit-breaker-open</code></td><td>Open-circuit messages from common Go/Java/Node libraries</td><td>high</td></tr>
+    <tr><td><code>upstream-timeout</code></td><td>Downstream call timeouts and deadline-exceeded lines</td><td>medium</td></tr>
+  </tbody>
+</table>
+
+<p>The output of this stage is one struct:</p>
+
+<pre><code>// pkg/fusion/types.go
+type FusedSignal struct {
+    Snapshot        signals.SystemSnapshot
+    MatchedPatterns []PatternMatch
+    SeverityScore   float64
+    Recommendation  string
+}</code></pre>
+
+<p>That severity score is the single number a downstream rule or LLM can use to gauge &ldquo;is this an actual incident, or just noise?&rdquo; The full snapshot is still carried along so the reasoning stage can cite specific numbers when it explains a decision.</p>
+
+<h2 id="reasoning">6. Reasoning: rules first, AI second</h2>
+
+<p>The rule-based agent is six ordered rules, each with a confidence value baked in. Whichever fires first wins, and only one fires per reconcile.</p>
+
+<table>
+  <thead><tr><th>#</th><th>Trigger</th><th>Action</th><th>Confidence</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>oom-killed</code> pattern</td><td>Scale up 50%</td><td>0.95</td></tr>
+    <tr><td>2</td><td><code>connection-pool-exhausted</code> AND p99 &gt; 2&nbsp;s</td><td>Scale up 50%</td><td>0.90</td></tr>
+    <tr><td>3</td><td>Error rate &gt; 10%</td><td>Scale up 30%</td><td>0.80</td></tr>
+    <tr><td>4</td><td><code>circuit-breaker-open</code> pattern</td><td>Scale up 30%</td><td>0.70</td></tr>
+    <tr><td>5</td><td>Severity = 0 AND CPU &lt; 20% AND 15&nbsp;min quiet</td><td>Scale down to min+1</td><td>0.60</td></tr>
+    <tr><td>6</td><td>(default)</td><td>Hold</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+
+<p>Rule 5 is the underrated one. The system doesn&rsquo;t scale down on a single quiet reconcile; it requires fifteen continuous minutes with no patterns and CPU under 20%. The cost of an unnecessary scale-up is a few minutes of extra capacity. The cost of a wrong scale-down is being short-handed when the next burst arrives. The rules treat these asymmetrically on purpose.</p>
+
+<p>The LLM-backed agents (<code>pkg/reasoning/anthropic.go</code>, <code>openai.go</code>, <code>ollama.go</code>) receive the same <code>FusedSignal</code> rendered as a structured prompt. The model is asked to output a JSON <code>ScaleDecision</code> with three fields the system cares about:</p>
+
+<pre><code>type ScaleDecision struct {
+    Action          string  // "scale_up" | "scale_down" | "hold"
+    TargetReplicas  int32
+    Confidence      float64
+    Reason          string  // natural-language explanation
+    Provider        string  // "rule-based" | "anthropic" | ...
+    PatternsMatched []string
+    // ... timestamps and audit fields
+}</code></pre>
+
+<p>If the model fails &mdash; HTTP error, timeout, malformed JSON, anything &mdash; the controller logs the error and falls through to the rule-based agent for that reconcile. The cluster never ends up in a state where &ldquo;the AI is down&rdquo; means &ldquo;the autoscaler is down.&rdquo;</p>
+
+<h2 id="refusal">7. Why the AI refuses bad scaling decisions</h2>
+
+<p>This is the moment in the talk where the slide deck slows down.</p>
+
+<p>While building this system, I ran two adversarial load tests to stress the AI&rsquo;s judgement. Both produced the same result, and both were exactly what you&rsquo;d hope a good engineer would do.</p>
+
+<div class="callout">
+  <p><strong>Test 1: inject 3-second latency on every request.</strong> The load generator pointed at <code>payment-service</code> with <code>delayMs=3000</code>. The latency histogram filled. p99 reached 4975&nbsp;ms &mdash; well past the 2&nbsp;s threshold.</p>
+  <p>The AI&rsquo;s decision: <code>hold</code>. Its reason: <em>&ldquo;Despite extremely high p99 latency (4975ms), CPU is only 2.3% with no errors and a severity score of zero, suggesting the latency is not load-related.&rdquo;</em></p>
+</div>
+
+<div class="callout">
+  <p><strong>Test 2: inject 25% HTTP 500 responses.</strong> Error rate climbed: 11.8% &rarr; 14.9% &rarr; 20.7% &rarr; 25.6%.</p>
+  <p>The AI&rsquo;s decision: <code>hold</code>. Its reason: <em>&ldquo;Despite a high HTTP error rate of 25.63%, CPU at 4% and p99 latency at 5ms suggest the errors are likely not load-related.&rdquo;</em></p>
+</div>
+
+<p>Both rejections are correct. Artificial latency from <code>/delay</code> won&rsquo;t be relieved by adding replicas &mdash; the bottleneck isn&rsquo;t capacity. Injected 5xx from <code>/status/500</code> won&rsquo;t be relieved by adding replicas &mdash; the requests aren&rsquo;t failing for capacity reasons. The model didn&rsquo;t pattern-match on &ldquo;number went up, scale up.&rdquo; It looked at the <em>shape</em> of the incident.</p>
+
+<p>This is the answer to the most common &mdash; and most reasonable &mdash; objection to putting LLMs in a control loop: <em>they&rsquo;ll hallucinate a scale-up and bankrupt me.</em> In the same conversation those tests took place, the operator scaled out correctly the instant a genuine CPU-bound load drove utilisation past 70% of the CPU request. <strong>Good agentic behaviour, in infrastructure, looks like restraint.</strong></p>
+
+<h2 id="policy">8. Policy: nesting safely inside HPA</h2>
+
+<p>The single most important constraint on a new autoscaler is that it must not fight the existing one. The <code>AgenticAutoscaler</code> CRD makes this explicit with two coexistence modes:</p>
+
+<ul>
+  <li><strong>Calibrated mode</strong> &mdash; the agentic autoscaler operates <em>inside</em> the HPA&rsquo;s bounds. Its <code>maxReplicas</code> is always ≤ HPA&rsquo;s <code>maxReplicas</code>, and its <code>minReplicas</code> is always ≥ HPA&rsquo;s <code>minReplicas</code>. HPA stays in place as a safety net. <em>This is the default for new deployments.</em></li>
+  <li><strong>Owner mode</strong> &mdash; the agentic autoscaler takes full control. HPA is deleted or suspended. Reserved for deployments where the operator has been running calibrated for at least two weeks without incident.</li>
+</ul>
+
+<p><code>pkg/policy/enforcer.go</code> is the place where every <code>ScaleDecision</code> is bounds-checked, cooldown-checked, and HPA-checked. The package has read-only access to HPAs &mdash; it cannot modify or delete one. Belt and braces.</p>
+
+<p>The cooldown is configurable per-CR (<code>spec.cooldownSeconds</code>, default 300&nbsp;s in calibrated mode, 60&nbsp;s in demos). After every scale event, the next non-hold decision is gated until the cooldown expires. <code>pkg/policy/cooldown.go</code> &mdash; one file, six tests.</p>
+
+<h2 id="explain">9. Explainability: every decision has a sentence</h2>
+
+<p>The reason a platform team can&rsquo;t adopt a black-box autoscaler isn&rsquo;t that the box might be wrong &mdash; it&rsquo;s that when it&rsquo;s wrong, nobody can write the postmortem. The operator addresses this in two places.</p>
+
+<p><strong>The decision audit log.</strong> Every decision &mdash; hold, scale, dry-run, even errors &mdash; is appended to a <code>ConfigMap</code> in the operator&rsquo;s namespace (<code>pkg/observability/configmap_recorder.go</code>). Each entry has a timestamp, the action, the old and new replica counts, the provider that produced it, the patterns matched, the confidence, and the full natural-language reason. <code>kubectl get configmap decision-audit-log -o jsonpath='{.data.decisions}'</code> is the entire interface.</p>
+
+<p><strong>Grafana annotations.</strong> Non-hold decisions are pushed to Grafana&rsquo;s annotation API (<code>pkg/observability/grafana.go</code>) so they appear as red vertical lines on every dashboard. Hover one and you see the same reason text. The SRE&rsquo;s mental model becomes: <em>&ldquo;the platform scaled at 14:32, and here&rsquo;s the sentence explaining why.&rdquo;</em></p>
+
+<blockquote>
+  <p>Scaled <code>payment-service</code> from 3 to 5 replicas. Reason: HTTP error rate exceeded 10% across two consecutive log windows with <code>connection-pool-exhausted</code> pattern matched 14 times. Confidence: 0.80. Provider: rule-based.</p>
+</blockquote>
+
+<p>That sentence is the contract. Everything in the system exists to make it accurate.</p>
+
+<h2 id="case">10. The case study: API gateway timeout storm</h2>
+
+<p>The scenario is a realistic one: an API gateway service in front of three downstream microservices. One downstream begins to slow down. The gateway&rsquo;s connection pool to that downstream fills up. Requests queue. Some time out. The HPA, watching CPU, sees nothing for the first several minutes &mdash; the CPU is fine, the gateway is mostly waiting on the network.</p>
+
+<p>The agentic operator, meanwhile, has been reading the gateway&rsquo;s logs. Inside two reconcile cycles it sees the <code>connection-pool-exhausted</code> pattern crossing three consecutive log windows. The fused signal&rsquo;s severity score climbs above zero. The reasoning agent considers the combined picture &mdash; latency creeping up, errors creeping up, the named pattern asserting itself &mdash; and decides to scale out by 50%.</p>
+
+<p>It posts a Grafana annotation: <em>&ldquo;Scaled due to timeout error rate exceeding threshold across 3 consecutive log windows, with connection-pool-exhausted pattern matched.&rdquo;</em></p>
+
+<p>Four minutes later, CPU on the original three pods finally crosses the HPA threshold &mdash; just as the new replicas are warming up. HPA would have scaled at exactly this moment. The agentic loop got there first by reading the signal humans always read first: the logs.</p>
+
+<h2 id="bugs">11. Three bugs you only find under load</h2>
+
+<p>The talk wouldn&rsquo;t be honest without this section. While preparing the demo, I drove sustained traffic at the system and found three real bugs the unit tests don&rsquo;t catch. All three are now in the issue tracker; one is a one-line fix; all three are worth talking about because they&rsquo;re the kind of bug any operator built this way will eventually hit.</p>
+
+<h3>Bug 1 — Executor empty namespace</h3>
+
+<p>The controller correctly defaults the target namespace to the CR&rsquo;s own namespace for <em>reading</em> the deployment. But when it passes the spec down to the scaler, it passes the raw spec, and the scaler reads <code>spec.Namespace</code> directly. If the CR didn&rsquo;t set <code>spec.namespace</code> explicitly, that field is empty, and the scaler looks up the deployment in namespace <code>""</code>. The result: the AI&rsquo;s scale-up decision is correct, the executor errors with <code>Deployment.apps "payment-service" not found</code>, replicas never move, and the reconcile silently retries with backoff. <strong>Symptom: nothing happens. Cause: empty string flowed through a boundary that should have defaulted.</strong></p>
+
+<p>The fix: one line in the controller, <code>aa.Spec.Namespace = deployNS</code>, before calling <code>Execute</code>. <code>deployNS</code> was already computed correctly a few lines earlier for the read path.</p>
+
+<h3>Bug 2 — The reconcile storm</h3>
+
+<p>Under load, the operator was reconciling every three seconds. Each reconcile collected signals, ran the AI, and updated <code>status</code>. The status update was triggering its own watch event, which enqueued the next reconcile immediately, which updated status, which&hellip; The 30-second requeue interval was set but had nothing to do because the queue never went empty.</p>
+
+<p>The cost was real: roughly 20 LLM calls per minute, sustained, even when the system was healthy and holding. It also pushed the kind node container hard enough that it OOM-killed itself during one of the load tests &mdash; the data plane survived, but the control plane took the cluster API server down with it.</p>
+
+<p>The fix is a predicate on the watch: ignore events whose only difference is a status field this controller wrote.</p>
+
+<h3>Bug 3 — Namespace RBAC for the management console</h3>
+
+<p>The operator ships an in-process web console (<code>pkg/queryapi</code>) on port 8090 with four tabs: Explore, Autoscalers, Onboard, and Load. The Onboard tab lets a platform engineer create an <code>AgenticAutoscaler</code> against any deployment in any namespace, with a dropdown of namespaces to pick from. That dropdown is populated by listing namespaces cluster-wide. The operator&rsquo;s ServiceAccount has no such permission &mdash; intentionally, by the security rules in <code>.claude/rules/security.md</code> &mdash; so the dropdown stays empty and the controller logs <code>namespaces is forbidden</code> every forty seconds.</p>
+
+<p>The fix is a small ClusterRole addition for <code>get/list/watch</code> on namespaces, scoped to the console&rsquo;s read path only. The console writes through the existing per-CR RBAC; this only opens the listing.</p>
+
+<div class="note">
+  <p><strong>The honest meta-point.</strong> All three bugs share a shape: a contract that the controller honored on the read path but didn&rsquo;t honor on the write path. The fix in each case is to make the boundary explicit. This is what writing operators teaches you, and it&rsquo;s a reasonable chunk of the talk.</p>
+</div>
+
+<h2 id="try">12. Try it yourself</h2>
+
+<p>The whole thing is open source, Apache 2.0, and runs end-to-end on a single laptop. The bootstrap script creates a local <code>kind</code> cluster, installs Prometheus + Loki + Grafana, builds the operator, deploys a sample workload, and wires up the load generator &mdash; in one command.</p>
+
+<pre><code>git clone https://github.com/Ngoga-Musagi/agentic-autoscaler
+cd agentic-autoscaler
+
+# One command, fully self-contained
+WITH_LOADGEN=1 bash hack/bootstrap.sh
+
+# In a second terminal — port-forwards for the three UIs
+bash hack/port-forward.sh</code></pre>
+
+<p>Then open three browser tabs:</p>
+
+<ul>
+  <li><strong>http://localhost:8090</strong> &mdash; the operator&rsquo;s console. Drive load from the Load tab. Watch decisions on the Explore tab. Manage CRs from the Autoscalers tab.</li>
+  <li><strong>http://localhost:3000</strong> &mdash; Grafana. Open the &ldquo;Agentic Autoscaler &mdash; Scaling Decisions&rdquo; dashboard. Every scale event appears as a red vertical line. Hover one to read the reason.</li>
+  <li><strong>http://localhost:9090</strong> &mdash; Prometheus, in case you want to query the raw signals yourself.</li>
+</ul>
+
+<p>If you want to onboard your own service instead of the sample, the Onboard tab is a form. Pick the deployment, set bounds, drop in custom PromQL if the service exposes non-standard metric names, and apply. No YAML required.</p>
+
+<h2 id="next">13. What&rsquo;s next</h2>
+
+<p>The repository has a clear roadmap. The next three items, in order:</p>
+
+<ol>
+  <li><strong>OpenTelemetry traces in the audit path.</strong> Right now decisions are recorded to a ConfigMap and Grafana annotations. Adding a trace span per reconcile would let SREs follow a single scaling event from the metric query through the AI call through the deployment patch &mdash; useful for postmortems on the operator itself.</li>
+  <li><strong>More log patterns.</strong> The current five cover the high-confidence cases. Adding <code>tls-handshake-timeout</code>, <code>dns-resolution-failed</code>, and <code>readiness-probe-failed</code> would broaden the coverage without expanding the rule surface much.</li>
+  <li><strong>A community-shareable prompt library.</strong> The LLM prompt in <code>pkg/reasoning/prompt.go</code> is a single file and a single version. It would benefit from external scrutiny and from a small library of variants tuned for different workload classes (web tier, queue worker, batch).</li>
+</ol>
+
+<p>If any of this resonates &mdash; or if you have a pattern in your logs that you wish your autoscaler could see &mdash; the repository accepts issues and pull requests. The codebase is small enough to read in an afternoon and modular enough that contributing to one stage doesn&rsquo;t require understanding the others.</p>
+
+<p>The goal of the project is not to ship the world&rsquo;s best autoscaler. It&rsquo;s to put a concrete, runnable answer to one question into the cloud-native ecosystem: <strong>what does it look like to bring AI into the Kubernetes control plane responsibly?</strong></p>
+
+<p>Built on Kubebuilder, Prometheus, Loki, KEDA, Helm, and Go. Vendor-neutral by construction. Reproducible end-to-end. Apache 2.0.</p>
+
+<p>Thanks for reading. The repository is open &mdash; clone it, run the demo, file an issue.</p>
+
+<footer>
+  <p><strong>Author:</strong> Alexis Ngoga &middot; AI Engineer &amp; Solutions Architect &middot; <a href="mailto:r.alexisngoga20@gmail.com">r.alexisngoga20@gmail.com</a></p>
+  <p><strong>Repository:</strong> <a href="https://github.com/Ngoga-Musagi/agentic-autoscaler"><code>github.com/Ngoga-Musagi/agentic-autoscaler</code></a> &middot; Apache 2.0</p>
+</footer>
+
+</div>
+</body>
+</html>
